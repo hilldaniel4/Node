@@ -18,11 +18,26 @@ db.on("error", console.error.bind(console, "MongoDB connection error:    "));
 
 
 
-var tasks = ["wake up", "eat breakfast", "q"];
-var completed = [];
+let tasks = ["wake up", "eat breakfast", "q"];
+let completed = [];
 
 app.get('/', function(request, response){
-    response.render('index', {tasks: tasks, completed: completed});
+    ToDo.find(function(err, todo){
+        if(err){
+            console.log(err);
+        }else {
+            tasks = [];
+            completed = [];
+            for(let i=0; i< todo.length; i++){
+                if(todo[i].done){
+                    completed.push(todo[i]);
+                }else {
+                    tasks.push(todo[i]);
+                }
+            }
+            response.render('index', {tasks: tasks, completed: completed});
+        }
+    })
 });
 
 app.post('/addToDo', function(req, res){
@@ -43,7 +58,7 @@ app.post('/removeToDo', function(req, res){
     const remove = req.body.check;
     console.log(typeof remove);
     if(typeof remove === "string"){
-        ToDo.updateOne({item:remove}, {done:true}, function(err){
+        ToDo.updateOne({_id:remove}, {done:true}, function(err){
             if(err){
                 console.log(err);
             }else{
@@ -52,23 +67,36 @@ app.post('/removeToDo', function(req, res){
         })
     }else if(typeof remove === "object"){
         for( var i=0; i< remove.length; i++){
-            tasks.splice( tasks.indexOf(remove[i]) , 1);
-            completed.push(remove[i]);
+            ToDo.updateOne({_id:remove[i]}, {done:true}, function(err){
+                if(err){
+                    console.log(err);
+                }
+            })
         }
         res.redirect("/");
     }
 });
 
 app.post('/deleteToDo', function(req, res){
-    const deletetask = req.body.deletetask;
-    if(typeof deletetask === "string"){
-        completed.splice( completed.indexOf(deletetask) , 1);
-    }else if(typeof deletetask === "object"){
-        for( var i=0; i< deletetask.length; i++){
-            completed.splice( completed.indexOf(deletetask[i]) , 1);
+    const deleteTask = req.body.delete;
+    if(typeof deleteTask === "string"){
+        ToDo.deleteOne({_id: deleteTask}, function(err){
+            if(err){
+                console.log(err);
+            } else{
+                res.redirect("/");
+            }
+        })
+    }else if(typeof deleteTask === "object"){
+        for( var i=0; i< deleteTask.length; i++){
+            ToDo.deleteOne({_id: deleteTask[i]}, function(err){
+                if(err){
+                    console.log(err);
+                }
+            })
         }
+        res.redirect("/");
     }
-    res.redirect("/");
 });
 
 app.listen(3000, function(){
