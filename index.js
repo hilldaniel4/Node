@@ -2,6 +2,7 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let mongoose = require('mongoose');
 const ToDo = require('./models/todo.model');
+let fetch = require('node-fetch');
 
 var app = express();
 app.set('view engine', 'ejs');
@@ -98,6 +99,10 @@ app.post('/deleteToDo', function(req, res){
         res.redirect("/");
     }
 });
+
+app.get("/zip", function(req, res){
+    res.render("zip");
+})
 
 app.listen(3000, function(){
     console.log('App is running on port 3000!');
