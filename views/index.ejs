@@ -24,12 +24,12 @@
                 Remove
             </button>
         </form>
-        <form action="" method="POST"></form>
+        <form action="/deleteToDo" method="POST">
             <h2>
                 Completed Tasks
             </h2>
             <% for( var i=0; i<completed.length; i++){ %>
-                <li><input type="checkbox" name="delete" value"<%= completed[i] %>" /><%= completed[i] %></li>
+                <li><input type="checkbox" name="deletetask" value"<%= completed[i] %>" /><%= completed[i] %></li>
             <% } %>
             <button formaction="/deleteToDo" type="submit">Delete</button>
         </form>
